@@ -112,6 +112,16 @@ app.get("/users", (req, res) => {
   }
 });
 
+app.post('/users', (req, res) => {
+  const user = req.body;
+  if (user) {
+    user.push(user);
+    res.status(201).send(`User added successfully.`);
+  } else {
+    res.status(400).send(`Invalid user.`)
+  }
+});
+
 
 app.listen(port, () => {
   console.log(
