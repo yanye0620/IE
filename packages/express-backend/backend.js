@@ -33,6 +33,13 @@ const users = {
   ]
 };
 
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 const findUserByNameNJob = (name, job) => {
   return users["users_list"].filter(
     (user) => user["name"] === name && user["job"] === job
@@ -47,14 +54,28 @@ const findUserByName = (name) => {
 
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
-
+/*
 const addUser = (user) => {
   users["users_list"].push(user);
   return user;
 };
+*/
+const addId = (user) => {
+  const randId = Math.random();
+  const newUser = { 
+    id: randId,
+    name: user["name"],
+    job: user["job"]
+  };
+  users["users_list"].push(newUser);
+  return newUser;
+};
 
-app.use(cors());
-app.use(express.json());
+const deleteUser = (body) => {
+  users["users_list"] = users["users_list"].filter(function (obj) {
+    return obj.id !== body;
+  });
+};
 
 /*app.get("/users", (req, res) => {
   const name = req.query.name;
@@ -78,11 +99,12 @@ app.get("/users/:id", (req, res) => {
   }
 });
 
-app.post("/users", (req, res) => {
+/*app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
   res.send();
 });
+
 
 app.delete("/users/:id", (req, res) => {
   const userId = req.params.id;
@@ -95,6 +117,7 @@ app.delete("/users/:id", (req, res) => {
     res.status(404).send(`User with ID ${userId} not found.`);
   }
 });
+*/
 
 app.get("/users", (req, res) => {
   const name = req.query.name;
@@ -112,14 +135,21 @@ app.get("/users", (req, res) => {
   }
 });
 
+
 app.post('/users', (req, res) => {
   const user = req.body;
   if (user) {
-    user.push(user);
-    res.status(201).send(`User added successfully.`);
+    const newUser = addId(user);
+    res.status(201).send(`User added successfully: ${newUser}`);
   } else {
-    res.status(400).send(`Invalid user.`)
+    res.status(400).send(`Invalid user: ${newUser}`)
   }
+});
+
+app.delete("/users/:id", (req, res) => {
+  const userToDelete = req.params["id"];
+  deleteUser(userToDelete);
+  res.status(204).send("Deletion Successful");
 });
 
 

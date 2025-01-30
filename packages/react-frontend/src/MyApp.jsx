@@ -6,22 +6,6 @@ import Form from "./Form";
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
-    
-  }
-  function updateList(person) {
-    setCharacters([...characters, person]);
-  }
-
-  function fetchUsers() {
-    const promise = fetch("http://localhost:8000/users");
-    return promise;
-  }
-
   useEffect(() => {
     fetchUsers()
       .then((res) => res.json())
@@ -31,8 +15,41 @@ function MyApp() {
       });
   }, []);
 
+  function removeOneCharacter(index) {
+    const url = `http://localhost:8000/users/${characters[index]._id}`;
+    fetch(url, {
+        method: "DELETE",
+    })
+    .then((res) => {
+        if (res.status === 204) {
+            const updated = characters.filter((character, i) => {
+                return i !== index;
+            });
+            setCharacters(updated);
+        } else {
+            throw new Error("Failed to delete user.");
+        }
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+  }
+
+  function updateList(person) {
+    postUser(person)
+    .then(() => setCharacters([...characters, person]))
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
+  function fetchUsers() {
+    const promise = fetch("http://localhost:8000/users");
+    return promise;
+  }
+
   function postUser(person) {
-    const promise = fetch("Http://localhost:8000/users", {
+    const promise = fetch("http://localhost:8000/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -42,21 +59,7 @@ function MyApp() {
   
     return promise;
   }
-  
-  function updateList(person) {
-    postUser(person)
-      .then(response => {
-        if (response.status == 201){
-          return response.json();
-        } else {
-          console.log(error);
-        }
-      })
-      .then(() => setCharacters([...characters, person]))
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+
 
   return (
     <div className="container">
