@@ -140,7 +140,7 @@ app.post('/users', (req, res) => {
   const user = req.body;
   if (user) {
     const newUser = addId(user);
-    res.status(201).send(`User added successfully: ${newUser}`);
+    res.status(201).send(newUser);
   } else {
     res.status(400).send(`Invalid user: ${newUser}`)
   }
